@@ -7,7 +7,7 @@
     * Help Message:
              ![Download-one-video](https://user-images.githubusercontent.com/29546157/46433545-a8e1ba00-c740-11e8-97bb-960cbc80bb0c.png)
      
-    * Download One Video:
+    * Download Single Video:
              ![Usage](https://user-images.githubusercontent.com/29546157/46433528-9ebfbb80-c740-11e8-8321-e6ac272e30c8.png)
            
     * Download From Videos-Links-File:
