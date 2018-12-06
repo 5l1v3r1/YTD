@@ -11,16 +11,16 @@ rd = "\033[1;31m" #>Red   #
 gr = "\033[1;32m" #>Green #
 yl = "\033[1;33m" #>Yallow#
 ###########################
-import socket,sys,optparse,urllib
-from lxml import etree
+import socket,sys,optparse,re
 from os import system as sy
 sy("")
 try:
+  import requests
   from pytube import YouTube as YT
-  from pytube.exceptions import RegexMatchError as YTERROR1, VideoUnavailable as YTERROR2
-except:
-	print(rd+"\n[!]"+yl+" Error: "+wi+" ["+gr+" Pytube "+wi+"] Library Is Not Exist "+rd+"!!!")
-	print(gr+"[+]"+wi+" Please Download It Use This Command: "+gr+"pip install pytube")
+except ImportError as e:
+        e = e[0][16:]
+	print(rd+"\n[!]"+yl+" Error: "+wi+" ["+gr+e+wi+"] Library Is Not Exist "+rd+"!!!")
+	print(gr+"[+]"+wi+" Please Download It Use This Command: "+gr+"pip install "+e)
 	exit(1)
 
 ## Check Your Internet Connection ##
@@ -34,38 +34,103 @@ def check():
 	pass
   return False
 cnet = check()
+## Get Video Title
+def get_title(video_url):
+  response = requests.get(video_url).text
+  title = re.findall(r'"title":"[^>]*",',response)[0].split(',')[0][9:-1]
+  return title
 
-#[ For Download One Video]
+
+## [For Download Single Video]
 def YTD_1v(link):
-	if cnet == True: # Connected :)
-	    print(gr+"\n["+wi+"~"+gr+"]"+wi+" Download Vedio In Progress "+gr+"....")
-	    try:
-	      title = etree.HTML(urllib.urlopen(link).read())
-	      title = title.xpath("//span[@id='eow-title']/@title")
-	      if len(title) > 0:
-	       title = ''.join(title)
-	       print(gr+"  ["+wi+"+"+gr+"]"+wi+" Video Title: "+yl+title)
-	      YT(link).streams.first().download("output/")
-	      print(gr+"  ["+wi+"+"+gr+"]"+wi+" Download "+gr+"Complete :)")
-	      print(gr+"  ["+wi+"~"+gr+"]"+wi+" Saved In: "+gr+"output/"+yl+title)
-	    except YTERROR1:
-		print(rd+"\n  ["+yl+"!"+rd+"]"+yl+" Please Check Video Link "+rd+"!!!")
-		exit(1)
-	    except YTERROR2:
-                print(rd+"\n  ["+yl+"!"+rd+"]"+yl+" Please Check Video Link "+rd+"!!!")
+	if cnet != True:
+          	   print(rd+"\n["+yl+"!"+rd+"]"+yl+" Please Check Your Internet Connection "+rd+"!!!")
+          	   exit(1)
+        
+        print(gr+"\n["+wi+"~"+gr+"]"+wi+" Download Vedio In Progress "+gr+"....")
+	try:
+           title = get_title(link)
+        except IndexError:
+                title = ""
+        print(gr+"  ["+wi+"+"+gr+"]"+wi+" Video Title: "+yl+title)
+        try:
+          YT(link).streams.first().download("output/")
+          print(gr+"  ["+wi+"+"+gr+"]"+wi+" Download "+gr+"Complete :)")
+	  print(gr+"  ["+wi+"~"+gr+"]"+wi+" Saved In: "+gr+"output/"+yl)
+	except KeyboardInterrupt:
+                print(" ")
                 exit(1)
-	    except KeyboardInterrupt:
+        except EOFError:
+                print(" ")
+                exit(1)
+
+# [For Download Youtube Videos In Playlist]
+
+def plyre(url):
+    if cnet != True:
+      print(rd+"\n["+yl+"!"+rd+"]"+yl+" Please Check Your Internet Connection "+rd+"!!!")
+      exit(1)
+    
+    if "list=" not in str(url):
+        print(rd+"\n["+yl+"!"+rd+"]"+yl+" Error: Incorrect Playlist URL "+rd+"!!!\n["+yl+"!"+rd+"]"+yl+" Please Check Your Playlist URL"+rd+"!")
+        exit(1)
+    req = url.rfind('=') + 1
+    ply = url[req:]
+    try:
+        response = requests.get(url).text
+    except Exception as e:
+        print("[!] Error: "+e)
+        exit(1)
+    repl = re.compile(r'watch\?v=\S+?list=' + ply)
+    found = re.findall(repl, response)
+    urls = []
+    if found:
+        for ur in found:
+            if '&' in ur:
+              vurl= ur.index('&')
+            urls.append('http://www.youtube.com/' + ur[:vurl])
+        checked = []
+        videos_URLS = []
+        for i in urls:
+            if i in checked: continue
+            videos_URLS.append(i)
+            checked.append(i)
+        loop = 1
+        print(gr+"\n["+wi+"~"+gr+"]"+wi+" Download PlayList In Progress"+gr+"....")
+        for link in videos_URLS:
+          if not link.strip(): continue
+          link = link.strip()
+          try:
+            print(wi+"["+gr+str(loop)+wi+"]"+gr+" Downloading Video_Url[ "+wi+str(link)+gr+" ]")
+            try:
+              title = get_title(link)
+            except IndexError:
+              title = ""
+            print(gr+"  ["+wi+"+"+gr+"]"+wi+" Video Title: "+yl+title)
+	    fname = "{}({})".format(title,str(loop))
+	    YT(link).streams.first().download("output/", filename=str(fname))
+	    print(gr+"  ["+wi+str(loop)+gr+"]"+wi+" Video Download "+gr+"Complete ")
+	    print(gr+"  ["+wi+"~"+gr+"]"+wi+" Saved In: "+gr+"output/"+fname)
+	    print(" ")
+	  except KeyboardInterrupt:
 		 print(" ")
 		 exit(1)
-	else:
-	   print(rd+"\n[!]"+yl+" Please Check Your Internet Connection "+rd+"!!!")
-	   exit(1)
-# [For Download Youtube PlayList]
+	  except EOFError:
+		 print(" ")
+		 exit(1)
+          except Exception as e:
+                print(rd+"  ["+yl+"!"+rd+"]"+yl+" Check Video Link In Line["+rd+str(loop)+yl+"] In File List "+rd+"!!!\n")
+	  loop +=1
+    else:
+        print(rd+"["+yl+"!"+rd+"]"+yl+" No videos Was Found In This PlayList "+rd+"!!!")
+        exit(1)
+                    
+# [For Download Youtube Videos from File Link]
 def YTD_flst(flst):
 	try:
 	  flstop = open(flst, "r").readlines()
-	except:
-	    print(rd+"\n[!]"+wi+"bash: cd: {}: No such file or directory".format(flst))
+	except IOError:
+	    print(rd+"\n["+yl+"!"+rd+"]"+yl+"Error: No such File: ["+rd+flst+yl+"]"+rd+" !!!")
 	    exit(1)
 	if cnet == True: # Connected :)
 	    print(gr+"\n["+wi+"~"+gr+"]"+wi+" Download All Videos From File List"+gr+"[~]")
@@ -74,62 +139,67 @@ def YTD_flst(flst):
 	      link = str(link).strip()
 	      try:
 		 print(wi+"["+gr+str(loop)+wi+"]"+gr+" Downloading Video_Url[ "+wi+str(link)+gr+" ]")
-                 title = etree.HTML(urllib.urlopen(link).read())
-                 title = title.xpath("//span[@id='eow-title']/@title")
-                 if len(title) > 0:
-                   title = ''.join(title)
-                   print(gr+"  ["+wi+"+"+gr+"]"+wi+" Video Title: "+yl+title)
+	         try:
+                   title = get_title(link)
+                 except IndexError:
+                    title = ""
+                 print(gr+"  ["+wi+"+"+gr+"]"+wi+" Video Title: "+yl+title)
 		 fname = "{}({})".format(title,str(loop))
 		 YT(link).streams.first().download("output/", filename=str(fname))
 	         print(gr+"  ["+wi+str(loop)+gr+"]"+wi+" Video Download "+gr+"Complete ")
 		 print(gr+"  ["+wi+"~"+gr+"]"+wi+" Saved In: "+gr+"output/"+fname)
 		 print(" ")
-	      except YTERROR1:
-		print(rd+"  ["+yl+"!"+rd+"]"+yl+" Check Video Link In Line["+rd+str(loop)+yl+"] In File List "+rd+"!!!\n")
-	      except YTERROR2:
-                print(rd+"  ["+yl+"!"+rd+"]"+yl+" Check Video Link In Line["+rd+str(loop)+yl+"] In File List "+rd+"!!!\n")
 	      except KeyboardInterrupt:
 		 print(" ")
 		 exit(1)
 	      except EOFError:
 		 print(" ")
 		 exit(1)
+              except Exception as e:
+                print(rd+"  ["+yl+"!"+rd+"]"+yl+" Check Video Link In Line["+rd+str(loop)+yl+"] In File List "+rd+"!!!\n")
 	      loop +=1
 	else:
-	   print(rd+"\n[!]"+yl+" Please Check Your Internet Connection "+rd+"!!!")
+	   print(rd+"\n["+yl+"!"+rd+"]"+yl+" Please Check Your Internet Connection "+rd+"!!!")
 	   exit(1)
  
 ## Usage ##
 
 parse = optparse.OptionParser("""
 Usage: python YTD.py [OPTIONS]
- _______________________________________________________________________________
-|          .:: OPTIONS ::.            	       .:: Description ::.              |
-+==================================+============================================+
-+				   +						+
-|  -u --video-url <Video Url>      |  Download Single Video From YouTube	|
-+  -f --file-list <video Url File> +  Download All Video From Links File	+
-|				   |						|
-+==================================+============================================+
+ ________________________________________________________________________________
+|          .:: OPTIONS ::.            	       .:: Description ::.               |
++===================================+============================================+
++				    +						 +
+|  -u --video-url <Video Url>       |  Download Single Video From YouTube	 |
++                                   +                                            +
+|  -p --playlist  <PlayList Url>    |  Download All Videos In YouTube PlayList   |
++                                   +                                            +
+|  -f --filelist  <Video File Links>|  Download All Video From Links File	 |
++				    +						 +
+|===================================+============================================|
 """)
 def main():
-  parse.add_option("-u","--video-url",dest="ovd",type="string")
-  parse.add_option("-f","--file-list",dest="flst",type="string")
+  parse.add_option("-u","-U","--video-url","--VIDEO-URL",dest="ovd",type="string")
+  parse.add_option("-f","-F","--filelist", "--FILELIST",dest="flst",type="string")
+  parse.add_option("-p","-P","--playlist","--PLAYLIST",dest="plyls",type="string")
+
   (options,args) = parse.parse_args()
   if options.ovd !=None:
 	link = options.ovd
-        YTD_1v(link)
+        YTD_1v(link, param=0)
 
   elif options.flst !=None:
 	flst = options.flst
 	YTD_flst(flst)
+  elif options.plyls:
+        playlistURL = options.plyls
+        plyre(playlistURL)
   else:
      print(parse.usage)
      exit(1)
-
+	
 if __name__ == "__main__":
     main()
-
 ##############################################################
 ##################### 		     #########################
 #####################   END OF TOOL  #########################
