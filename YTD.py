@@ -119,7 +119,7 @@ def plyre(url):
 		 print(" ")
 		 exit(1)
           except Exception as e:
-                print(rd+"  ["+yl+"!"+rd+"]"+yl+" Check Video Link In Line["+rd+str(loop)+yl+"] In File List "+rd+"!!!\n")
+                print(rd+"  ["+yl+"!"+rd+"]"+yl+" Error: In Video Number["+rd+str(loop)+yl+"] In PlayList "+rd+"!!!\n")
 	  loop +=1
     else:
         print(rd+"["+yl+"!"+rd+"]"+yl+" No videos Was Found In This PlayList "+rd+"!!!")
@@ -186,20 +186,20 @@ def main():
   (options,args) = parse.parse_args()
   if options.ovd !=None:
 	link = options.ovd
-        YTD_1v(link, param=0)
-
-  elif options.flst !=None:
-	flst = options.flst
-	YTD_flst(flst)
+        YTD_1v(link)
   elif options.plyls:
         playlistURL = options.plyls
         plyre(playlistURL)
+  elif options.flst !=None:
+	flst = options.flst
+	YTD_flst(flst)
   else:
      print(parse.usage)
      exit(1)
 	
 if __name__ == "__main__":
     main()
+
 ##############################################################
 ##################### 		     #########################
 #####################   END OF TOOL  #########################
