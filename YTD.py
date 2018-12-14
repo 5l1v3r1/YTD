@@ -51,7 +51,7 @@ def YTD_1v(link):
 	try:
            title = get_title(link)
         except IndexError:
-                title = ""
+                title = "Unknown Video Title !!!"
         print(gr+"  ["+wi+"+"+gr+"]"+wi+" Video Title: "+yl+title)
         try:
           YT(link).streams.first().download("output/")
@@ -78,8 +78,8 @@ def plyre(url):
     ply = url[req:]
     try:
         response = requests.get(url).text
-    except Exception as e:
-        print("[!] Error: "+e)
+    except Exception:
+        print(rd+"["+yl+"!"+rd+"]"+yl+" Error: Please Check Your YouTube PlayList URL "+rd+"!!!")
         exit(1)
     repl = re.compile(r'watch\?v=\S+?list=' + ply)
     found = re.findall(repl, response)
@@ -97,6 +97,7 @@ def plyre(url):
             checked.append(i)
         loop = 1
         print(gr+"\n["+wi+"~"+gr+"]"+wi+" Download PlayList In Progress"+gr+"....")
+	print(wi+"  ["+gr+"*"+wi+"]"+gr+" Totla Videos In PlayList <"+yl+str(len(videos_URLS))+gr+">")
         for link in videos_URLS:
           if not link.strip(): continue
           link = link.strip()
@@ -105,7 +106,7 @@ def plyre(url):
             try:
               title = get_title(link)
             except IndexError:
-              title = ""
+              title = "Unknown Video Title !!!"
             print(gr+"  ["+wi+"+"+gr+"]"+wi+" Video Title: "+yl+title)
 	    fname = "{}({})".format(title,str(loop))
 	    YT(link).streams.first().download("output/", filename=str(fname))
@@ -142,7 +143,7 @@ def YTD_flst(flst):
 	         try:
                    title = get_title(link)
                  except IndexError:
-                    title = ""
+                    title = "Unknown Video Title !!!"
                  print(gr+"  ["+wi+"+"+gr+"]"+wi+" Video Title: "+yl+title)
 		 fname = "{}({})".format(title,str(loop))
 		 YT(link).streams.first().download("output/", filename=str(fname))
@@ -172,11 +173,22 @@ Usage: python YTD.py [OPTIONS]
 +				    +						 +
 |  -u --video-url <Video Url>       |  Download Single Video From YouTube	 |
 +                                   +                                            +
-|  -p --playlist  <PlayList Url>    |  Download All Videos In YouTube PlayList   |
+|  -p --playList  <PlayList Url>    |  Download All Videos In YouTube PlayList   |
 +                                   +                                            +
-|  -f --filelist  <Video File Links>|  Download All Video From Links File	 |
+|  -f --fileList  <Video File Links>|  Download All Video From Links File	 |
 +				    +						 +
 |===================================+============================================|
+|                            .:: EXAMPLES ::.                                    |
+==================================================================================
+|[1]~[Download Single YouTube Video]
+|---->>>>>>>>>>>>>>> python YTD.py -u https://youtu.be/60ItHLz5WEA
+|
+|[2]~[Download Some YouTube PlayList]
+|---->>>>>>>>>>>>>>> python YTD.py -p https://www.youtube.com/watch?v=_UonBSAzITE&list=PLYT4vq6pQVSv3zECGufMrCDXKX0Ouxzde
+|
+|[3]~[Download All Videos From File Videos Links]
+|---->>>>>>>>>>>>>>> python YTD.py links.txt
+
 """)
 def main():
   parse.add_option("-u","-U","--video-url","--VIDEO-URL",dest="ovd",type="string")
