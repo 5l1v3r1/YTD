@@ -10,6 +10,7 @@ wi = "\033[1;37m" #>>White#
 rd = "\033[1;31m" #>Red   #
 gr = "\033[1;32m" #>Green #
 yl = "\033[1;33m" #>Yallow#
+pu = "\033[1;35m" #>Purple# 
 ###########################
 import socket,sys,optparse,re
 from os import system as sy
@@ -97,12 +98,14 @@ def plyre(url):
             checked.append(i)
         loop = 1
         print(gr+"\n["+wi+"~"+gr+"]"+wi+" Download PlayList In Progress"+gr+"....")
-	print(wi+"  ["+gr+"*"+wi+"]"+gr+" Totla Videos In PlayList <"+yl+str(len(videos_URLS))+gr+">")
+        hmany = len(videos_URLS)
+	print(wi+"  ["+gr+"*"+wi+"]"+gr+" Total Videos In PlayList <"+yl+str(hmany)+gr+">")
+	print(wi+"-------------------------------------")
         for link in videos_URLS:
           if not link.strip(): continue
           link = link.strip()
           try:
-            print(wi+"["+gr+str(loop)+wi+"]"+gr+" Downloading Video_Url[ "+wi+str(link)+gr+" ]")
+            print(wi+"  ["+gr+str(loop)+wi+"]"+gr+" Downloading Video_Url[ "+wi+str(link)+gr+" ]")
             try:
               title = get_title(link)
             except IndexError:
@@ -110,9 +113,9 @@ def plyre(url):
             print(gr+"  ["+wi+"+"+gr+"]"+wi+" Video Title: "+yl+title)
 	    fname = "{}({})".format(title,str(loop))
 	    YT(link).streams.first().download("output/", filename=str(fname))
-	    print(gr+"  ["+wi+str(loop)+gr+"]"+wi+" Video Download "+gr+"Complete ")
-	    print(gr+"  ["+wi+"~"+gr+"]"+wi+" Saved In: "+gr+"output/"+fname)
-	    print(" ")
+	    print(gr+"    ["+wi+str(loop)+gr+"]"+wi+" Video Download "+gr+"Complete ")
+	    print(gr+"    ["+wi+"~"+gr+"]"+wi+" Saved In: "+gr+"output/"+fname)
+	    print(pu+"========")
 	  except KeyboardInterrupt:
 		 print(" ")
 		 exit(1)
