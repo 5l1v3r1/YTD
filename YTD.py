@@ -68,13 +68,12 @@ def YTD_1v(link):
 # [For Download Youtube Videos In Playlist]
 
 def plyre(url):
+    if not "list=" in str(url):
+        print(rd+"\n["+yl+"!"+rd+"]"+yl+" Error: Incorrect Playlist URL "+rd+"!!!\n["+yl+"!"+rd+"]"+yl+" Please Check Your Playlist URL"+rd+"!")
+        exit(1)
     if cnet != True:
       print(rd+"\n["+yl+"!"+rd+"]"+yl+" Please Check Your Internet Connection "+rd+"!!!")
       exit(1)
-    
-    if "list=" not in str(url):
-        print(rd+"\n["+yl+"!"+rd+"]"+yl+" Error: Incorrect Playlist URL "+rd+"!!!\n["+yl+"!"+rd+"]"+yl+" Please Check Your Playlist URL"+rd+"!")
-        exit(1)
     req = url.rfind('=') + 1
     ply = url[req:]
     try:
@@ -113,7 +112,7 @@ def plyre(url):
             print(gr+"  ["+wi+"+"+gr+"]"+wi+" Video Title: "+yl+title)
 	    fname = "{}({})".format(title,str(loop))
 	    YT(link).streams.first().download("output/", filename=str(fname))
-	    print(gr+"    ["+wi+str(loop)+gr+"]"+wi+" Video Download "+gr+"Complete ")
+	    print(gr+"    ["+yl+str(loop)+gr+"]"+wi+" Video Download "+gr+"Complete ")
 	    print(gr+"    ["+wi+"~"+gr+"]"+wi+" Saved In: "+gr+"output/"+fname)
 	    print(pu+"========")
 	  except KeyboardInterrupt:
@@ -220,6 +219,7 @@ def main():
 	
 if __name__ == "__main__":
     main()
+    
 ##############################################################
 ##################### 		     #########################
 #####################   END OF TOOL  #########################
