@@ -13,7 +13,7 @@ yl = "\033[1;33m" #>Yallow#
 pu = "\033[1;35m" #>Purple# 
 ###########################
 import socket,sys,optparse,re
-from os import system as sy
+from os import system as sy, path,mkdir
 sy("")
 try:
   import requests
@@ -184,21 +184,27 @@ Usage: python YTD.py [OPTIONS]
 |                            .:: EXAMPLES ::.                                    |
 ==================================================================================
 |[1]~[Download Single YouTube Video]
-|---->>>>>>>>>>>>>>> python YTD.py -u https://youtu.be/60ItHLz5WEA
+|
+++--->>>>>>>>>>>>>>> python YTD.py -u https://youtu.be/60ItHLz5WEA
 |
 |[2]~[Download Some YouTube PlayList]
-|---->>>>>>>>>>>>>>> python YTD.py -p https://www.youtube.com/watch?v=_UonBSAzITE&list=PLYT4vq6pQVSv3zECGufMrCDXKX0Ouxzde
+|
+++--->>>>>>>>>>>>>>> python YTD.py -p https://www.youtube.com/watch?v=_UonBSAzITE&list=PLYT4vq6pQVSv3zECGufMrCDXKX0Ouxzde
 |
 |[3]~[Download All Videos From File Videos Links]
-|---->>>>>>>>>>>>>>> python YTD.py links.txt
+|
+++--->>>>>>>>>>>>>>> python YTD.py links.txt
 
 """)
 def main():
   parse.add_option("-u","-U","--video-url","--VIDEO-URL",dest="ovd",type="string")
-  parse.add_option("-f","-F","--filelist", "--FILELIST",dest="flst",type="string")
   parse.add_option("-p","-P","--playlist","--PLAYLIST",dest="plyls",type="string")
+  parse.add_option("-f","-F","--filelist", "--FILELIST",dest="flst",type="string")
+  
 
   (options,args) = parse.parse_args()
+  if not path.isdir("output"):
+	mkdir("output")
   if options.ovd !=None:
 	link = options.ovd
         YTD_1v(link)
@@ -214,7 +220,6 @@ def main():
 	
 if __name__ == "__main__":
     main()
-
 ##############################################################
 ##################### 		     #########################
 #####################   END OF TOOL  #########################
